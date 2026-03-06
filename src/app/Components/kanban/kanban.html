@@ -1,0 +1,45 @@
+<main class="kanban-main">
+  <section class="kanban-header">
+    <div class="mb-4">
+      <input
+        #searchInput
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange($event)"
+        placeholder="Pesquisar tarefas..."
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  </section>
+
+  <section class="kanban-board">
+    <button
+      class="bg-green-500 text-white px-2 py-1 text-sm rounded mb-4"
+      (click)="novaColuna()"
+      [disabled]="creating"
+    >
+      + Nova coluna
+    </button>
+
+    <div *ngIf="loadError" class="text-red-600 mb-4">
+      {{ loadError }}
+    </div>
+
+    <div
+      *ngIf="colunas.length > 0 && filteredColunas.length === 0 && searchTerm"
+      class="text-gray-600"
+    >
+      Nenhuma tarefa encontrada para "{{ searchTerm }}".
+    </div>
+
+    <app-coluna
+      *ngFor="let coluna of filteredColunas; let i = index; trackBy: trackById"
+      [coluna]="coluna"
+      [indice]="getRealIndex(coluna)"
+      [listId]="getListId(getRealIndex(coluna))"
+      [connectedTo]="getConnected(getRealIndex(coluna))"
+      [todasColunas]="colunas"
+      (changed)="onColumnChange($event)"
+    ></app-coluna>
+  </section>
+</main>

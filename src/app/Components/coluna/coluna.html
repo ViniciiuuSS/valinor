@@ -1,0 +1,59 @@
+<div
+  class="kanban-column"
+  cdkDropList
+  [id]="coluna.id || ''"
+  [cdkDropListConnectedTo]="connectedTo || []"
+  [cdkDropListData]="coluna.tarefas || []"
+  (cdkDropListDropped)="drop($event)"
+>
+  <div class="">
+    <button
+      title="Adicionar nova tarefa"
+      class="bg-blue-500 text-white px-4 py-2 rounded float-right relative cursor-pointer"
+      (click)="openModal(coluna)"
+    >
+      <svg
+        class="w-6 h-6 text-gray-800 dark:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 12h14m-7 7V5"
+        />
+      </svg>
+    </button>
+  </div>
+  <div class="flex items-center justify-between mb-4">
+    <input
+      #nomeInput
+      [disabled]="true"
+      [id]="coluna.nome"
+      type="text"
+      [(ngModel)]="coluna.nome"
+      class="mr-1 bg-transparent border border-gray-300 rounded-md p-2"
+      (blur)="desabilitarInput(nomeInput)"
+    />
+    <div class="flex gap-2">
+      <button class="text-sm" (click)="editarColuna()">Editar</button>
+      <button
+        class="text-sm text-red-600"
+        title="Excluir coluna"
+        [disabled]="deleting"
+        (click)="excluirColuna()"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+  <div *ngFor="let tarefa of coluna.tarefas; let tIndex = index" class="mb-2">
+    <app-card [tarefa]="tarefa" [colIndex]="indice" [tarefaIndex]="tIndex"></app-card>
+  </div>
+</div>

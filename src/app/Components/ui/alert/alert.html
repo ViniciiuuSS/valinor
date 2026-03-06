@@ -1,0 +1,50 @@
+<div class="alert-container fixed top-4 right-4 z-50 space-y-2">
+  <div
+    *ngFor="let a of alerts"
+    [attr.data-id]="a.id"
+    class="flex items-center p-3 rounded shadow-md"
+    [ngClass]="{
+      'bg-success-soft text-fg-success-strong border-t-4 border-success-subtle':
+        a.tipo === 'success',
+      'bg-danger-soft text-fg-danger-strong border-t-4 border-danger-subtle': a.tipo === 'danger',
+      'bg-info-soft text-fg-info-strong border-t-4 border-info-subtle': a.tipo === 'info',
+      'bg-warning-soft text-fg-warning-strong border-t-4 border-warning-subtle':
+        a.tipo === 'warning',
+    }"
+  >
+    <div class="me-2">
+      <svg
+        class="w-5 h-5"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </div>
+    <div class="flex-1 text-sm">{{ a.mensagem }}</div>
+    <button type="button" class="ms-2 p-1" (click)="remover(a.id)">
+      <span class="sr-only">Fechar</span>
+      <svg
+        class="w-4 h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+  </div>
+</div>

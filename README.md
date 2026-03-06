@@ -1,59 +1,151 @@
-# AngularKanban
+# Angular Kanban
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.5.
+Projeto de teste tecnico com Kanban completo (frontend + backend), usando Angular no cliente, NestJS para API/WebSocket e PostgreSQL hospedado no Supabase.
 
-## Development server
+## Objetivo
 
-To start a local development server, run:
+Aplicacao para gerenciamento de colunas e tarefas, com suporte a:
 
-```bash
-ng serve
-```
+- Criacao, edicao e remocao de colunas
+- Criacao, edicao e remocao de tarefas
+- Movimentacao de tarefas entre colunas
+- Atualizacao em tempo real via WebSocket
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Stack Tecnologica
 
-## Code scaffolding
+- Angular 21 (SSR habilitado)
+- NestJS 11 (API REST + WebSocket)
+- PostgreSQL (`pg`)
+- Supabase (host do banco PostgreSQL)
+- Socket.IO
+- TypeScript
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Estrutura do Projeto
 
-```bash
-ng generate component component-name
-```
+Principais pastas:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- `src/app/` - Frontend Angular (componentes e servicos)
+- `src/api/` - Backend NestJS (controllers, services e gateway websocket)
+- `src/db/` - Repositorios e conexao com banco
+- `sql/schema.sql` - Script SQL para criacao do schema e tabelas
 
-```bash
-ng generate --help
-```
+## Como Rodar Localmente
 
-## Building
+### 1. Pre-requisitos
 
-To build the project run:
+- Node.js 20+
+- npm 10+
+- Banco PostgreSQL (local ou Supabase)
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### 2. Instalar dependencias
 
 ```bash
-ng e2e
+npm install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### 3. Configurar variaveis de ambiente
 
-## Additional Resources
+Crie um arquivo `.env` na raiz do projeto com:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```env
+POSTGRES_URL=postgresql://usuario:senha@host:5432/postgres
+POSTGRES_SSL=true
+PORT=8000
+```
+
+Observacoes:
+
+- `POSTGRES_URL` deve apontar para o banco PostgreSQL.
+- Em Supabase, normalmente `POSTGRES_SSL=true`.
+- Em banco local sem SSL, use `POSTGRES_SSL=false`.
+
+### 4. Criar estrutura do banco
+
+Execute o script:
+
+```bash
+sql/schema.sql
+```
+
+### 5. Inicializacao local (front e servidor)
+
+Em dois terminais diferentes:
+
+Terminal 1 (Frontend Angular):
+
+```bash
+ng serve --port 4200
+```
+
+Terminal 2 (Servidor):
+
+```bash
+npm run start
+```
+
+Aplicacao em `http://localhost:4200` e servidor em `http://localhost:8000`.
+
+### 6. Build e execucao (SSR)
+
+```bash
+npm run build
+npm start
+```
+
+## Scripts Disponiveis
+
+- `npm run dev` - ambiente de desenvolvimento com proxy para API
+- `npm run build` - build da aplicacao
+- `npm start` - sobe servidor SSR/Express em producao
+- `npm run watch` - build em modo watch
+- `npm test` - testes unitarios
+
+## API (Resumo)
+
+### Colunas
+
+- `GET /api/colunas`
+- `POST /api/colunas`
+- `PUT /api/colunas/:id`
+- `DELETE /api/colunas/:id`
+
+### Tarefas
+
+- `GET /api/colunas/:id/tarefas`
+- `POST /api/tarefas`
+- `PUT /api/tarefas/:id`
+- `DELETE /api/tarefas/:id`
+- `PATCH /api/tarefas/:id/mover`
+
+## WebSocket (Tempo Real)
+
+Eventos principais emitidos:
+
+- `tarefa-atualizada`
+- `coluna-atualizada`
+
+## Supabase (Banco de Dados)
+
+Este projeto usa o **Supabase como provedor de PostgreSQL**.
+
+Como configurar:
+
+1. Crie um projeto no Supabase.
+2. Copie a string de conexao PostgreSQL do painel do Supabase.
+3. Configure no `.env` a variavel `POSTGRES_URL`.
+4. Execute `sql/schema.sql` no SQL Editor do Supabase para criar schema, tabelas, indices e funcao de movimentacao.
+
+## Testes
+
+Para executar testes unitarios:
+
+```bash
+npm test
+```
+
+## 👨‍💻 Autor
+
+- LinkedIn: https://www.linkedin.com/in/vinicius-guedes-9b1508208/
+- GitHub: https://github.com/ViniciiuuSS
+- Email: vinicraft556@gmail.com
+- Telefone: 17991026265
