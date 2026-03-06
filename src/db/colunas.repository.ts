@@ -1,4 +1,5 @@
-import pool from './pool';
+import pool, { useDb } from './pool';
+import * as local from './local-store';
 import { Tarefa } from './tarefas.repository';
 
 export interface Coluna {
@@ -23,18 +24,20 @@ const baseSelect = `
   LEFT JOIN tarefas t ON t.coluna_id = c.id
 `;
 
-/** lista ordenada */
 export async function listColunas(): Promise<Coluna[]> {
+  if (!useDb) return local.listColunas() as Coluna[];
   const { rows } = await pool.query(baseSelect + ` GROUP BY c.id ORDER BY c.posicao`);
   return rows;
 }
 
 export async function getColuna(id: string): Promise<Coluna | null> {
+  if (!useDb) return local.getColuna(id) as Coluna | null;
   const { rows } = await pool.query(baseSelect + ` WHERE c.id = $1 GROUP BY c.id`, [id]);
   return rows[0] || null;
 }
 
 export async function createColuna(data: NewColuna): Promise<Coluna> {
+  if (!useDb) return local.createColuna(data) as Coluna;
   const q =
     'INSERT INTO colunas (nome,posicao) VALUES ($1, COALESCE($2, (SELECT COALESCE(MAX(posicao),0)+1 FROM colunas))) RETURNING *';
   const { rows } = await pool.query(q, [data.nome, data.posicao]);
@@ -45,6 +48,7 @@ export async function updateColuna(
   id: string,
   changes: Partial<NewColuna>,
 ): Promise<Coluna | null> {
+  if (!useDb) return local.updateColuna(id, changes) as Coluna | null;
   const q =
     'UPDATE colunas SET nome = COALESCE($1,nome), posicao = COALESCE($2,posicao) WHERE id = $3 RETURNING *';
   const { rows } = await pool.query(q, [changes.nome, changes.posicao, id]);
@@ -52,5 +56,9 @@ export async function updateColuna(
 }
 
 export async function deleteColuna(id: string): Promise<void> {
+  if (!useDb) {
+    local.deleteColuna(id);
+    return;
+  }
   await pool.query('DELETE FROM colunas WHERE id = $1', [id]);
 }

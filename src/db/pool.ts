@@ -1,39 +1,27 @@
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const connString = process.env['POSTGRES_URL'] || process.env['DATABASE_URL'] || '';
-const useSsl = (process.env['POSTGRES_SSL'] || '').toLowerCase() === 'true';
 
-let pool = new Pool({
-  connectionString: connString,
-  ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {}),
-});
+export const useDb = !!connString;
 
-pool.on('connect', (client) => {
-  client.query('SET search_path TO "Kanban"').catch(() => {});
-});
+const pool = useDb
+  ? new Pool({
+      connectionString: connString,
+      ssl: { rejectUnauthorized: false },
+    })
+  : (null as unknown as Pool);
 
-pool.query('SELECT 1').catch((err: any) => {
-  const msg: string = (err && err.message) || '';
-  if (
-    /server does not support ssl|does not support SSL/i.test(msg) ||
-    (/SSL/i.test(msg) && !useSsl)
-  ) {
-    return;
-  }
+if (pool) {
+  pool.on('connect', (client) => {
+    client.query('SET search_path TO "Kanban"').catch(() => {});
+  });
+  pool.on('error', (err) => {
+    console.error('Pool error:', err.message);
+  });
+}
 
-  if (/server does not support ssl|does not support SSL/i.test(msg)) {
-    console.warn('Pool: servidor não suporta SSL — tentando reconectar sem SSL');
-    try {
-      pool.end().catch(() => {});
-    } catch {}
-    pool = new Pool({ connectionString: connString });
-    pool.on('connect', (client) => {
-      client.query('SET search_path TO "Kanban"').catch(() => {});
-    });
-  }
-});
+if (!useDb) {
+  console.log('[pool] Nenhuma URL de banco configurada — usando armazenamento local (JSON)');
+}
 
 export default pool;
